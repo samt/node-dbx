@@ -6,6 +6,8 @@ Event-driven, DB-agnostic, sane ORM.
 
 This is really just a dispatcher that sends everything around, making your database more event-driven. It abstracts away the database making a SQL system resemble more of a document-based store. It has some small opinions about the final schema, but they can be overridden. This system also enables the use of caching engines to squeeze better performance out of your fetch operations.
 
+**This is still a WIP and does not contain working code as of yet**
+
 # Install
 
 	npm install dbx --save
@@ -14,65 +16,8 @@ This is really just a dispatcher that sends everything around, making your datab
 
 ```js
 var dbx = require('dbx');
-var db = new dbx.Connection({
-	driver: require('dbx-mysql'),
-	host: 'localhost',
-	pool: true
-});
 
-// connect
-db.connect(function (err) {
-
-});
-
-db.on('connection', function () {});
-db.on('error', function () {});
-db.on('disconnect', function () {});
-
-db.cache({
-	engine: require('dbx-memcached'),
-	ttl: 1800, // 30 mins
-	maxmemory: '2M' // 2 Megabytes
-});
-
-db.define('User', {
-	id: 'autoint',
-	username: 'string',
-	email: '',
-	_pk: 'id',
-	_uq: [ 'username', 'email' ]
-});
-
-db.syncModels(function (err) {
-
-});
-
-var User = db.model('User');
-
-// get one by ID
-User.get(id, function (err, user) {
-	if (!user.exists) {
-		// user does not exist!
-	}
-});
-
-var query = new dbx.Query();
-query.where({ username: 'adsf' });
-
-User.search(query, function (err, users) {
-
-});
-
-user.save();
-
-user.remove();
-
-/// -----
-
-
-var dbx = require('dbx');
-var conn = dbx.getConnection();
-var conn.
+// @todo
 ```
 
 # API
