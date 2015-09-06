@@ -1,0 +1,17 @@
+# node/npm specific
+*.log
+npm-debug.log*
+node_modules
+pids
+*.pid
+*.seed
+
+# os stuff
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.lnk

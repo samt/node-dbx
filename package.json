@@ -1,0 +1,33 @@
+{
+  "name": "dbx",
+  "version": "0.0.3",
+  "description": "DB-agnostic, hookable, event-driven, ORM",
+  "main": "dbx.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samt/node-dbx.git"
+  },
+  "keywords": [
+    "db",
+    "database",
+    "data",
+    "sql",
+    "orm"
+  ],
+  "author": "Sam Thompson <git@samt.us>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/samt/node-dbx/issues"
+  },
+  "homepage": "https://github.com/samt/node-dbx#readme",
+  "devDependencies": {
+    "mocha": "^2.3.0"
+  },
+  "dependencies": {
+    "async": "^1.4.2",
+    "underscore": "^1.8.3"
+  }
+}
