@@ -1,7 +1,7 @@
 {
   "name": "dbx",
   "version": "0.0.5",
-  "description": "DB-agnostic, hookable, event-driven, ORM",
+  "description": "Event-driven, agnostic, sane ORM for the rest of us",
   "main": "dbx.js",
   "scripts": {
     "test": "mocha"
@@ -15,7 +15,8 @@
     "database",
     "data",
     "sql",
-    "orm"
+    "orm",
+    "cache"
   ],
   "author": "Sam Thompson <git@samt.us>",
   "license": "MIT",
