@@ -97,7 +97,7 @@ var db = dbx.Connection.get(); // get the main connection
 var anotherDb = dbx.Connection.get('myservice'); // get a named connection!
 ```
 
-# <a name="Defining-Models"></a> Defining Models
+## <a name="Defining-Models"></a> Defining Models
 
 Models are nothing more than a representation of a table that they owe their namesake to. We abstract types here to very high-level ones, but you may also use the lower level ones if it suites your needs better.
 
@@ -106,6 +106,7 @@ Models are nothing more than a representation of a table that they owe their nam
 var User = db.define('User', {
 	name: { type: 'string' },
 	email: { type: 'string', key: 'unique' },
+	password: { type: 'string' },
 	type: { type: 'flag', key: 'index', values: { '0': 'Normal', '1': 'Admin' } },
 	dateLastLogin: { type: 'timestamp' },
 	social: { type: 'json' },
@@ -135,7 +136,7 @@ A few things are going on here:
 * Most date fields are absent. `dateCreated` and `dateUpdated` are given to you by default.
 * Shorthand notation is used in the Comment model, where you simply define the type instead of a field object.
 
-## <a name="Field-Types"></a> Field types
+### <a name="Field-Types"></a> Field types
 
 * `type`: **(Required)** Field type, use one of the following:
     * `id`: Auto-incrementing ID, unsigned. Indexed (as Primary Key) automatically.
@@ -158,6 +159,83 @@ A few things are going on here:
 * `values`: **(Optional)** Useful for the `flag` type only. Key/value Object (with quoted numbers as keys) containing possible values.
 * `model`: **(Optional)** Useful for the `fk` type only. May use the foreign key shorthand instead.
 * `field`: **(Optional)** Useful for the `fk` type only. May use the foreign key shorthand instead.
+
+## Inserting records
+
+```js
+var User = db.model('User');
+
+User.create({
+	'name': 'John Doe',
+	'email': 'john@doe.com',
+	'password': 'hunter2'
+}, function (err, record) {
+	if (err) throw err;
+
+	console.log('User exists:', record.exists);
+	console.log(record.name + ' <' + record.email + '>');
+});
+```
+
+## Get a record by ID
+
+```js
+var User = db.model('User');
+
+User.get(5, function (err, user) {
+	console.log('Hello, ' + user.name);
+});
+```
+
+## Save a record
+
+```js
+var User = db.model('User');
+
+User.get(5, function (err, user) {
+	user.email = 'john.doe@gmail.com';
+
+	user.save(function (err) {
+		if (err) throw err;
+		console.log('New email saved!');
+	});
+});
+```
+
+## Delete a record
+
+```js
+var User = db.model('User');
+
+User.get(5, function (err, user) {
+	user.delete(function (err) {
+		if (err) throw err;
+		console.log('User exists? ', user.exists);
+	});
+});
+```
+
+## Using events
+
+In the previous `User.create` example, you can see the password is sent to the database with what looks like pain text. We can use an event hook for the User model to transform the password into a hashed version of whatever the password is.
+
+```js
+var bcrypt = require('bcryptjs');
+User.on('preSave', function (record, callback) {
+	// preSave is NOT a validation hook, it may be possible that we do have/want
+	// a password to update an incoming record with.
+	if (!record.password.length) {
+		return callback();
+	}
+
+	bcrypt.hash(record.password, function (err, hashed) {
+		if (err) return callback(err);
+
+		record.password = hashed;
+		return callback();
+	});
+});
+```
 
 # API
 
@@ -323,7 +401,6 @@ Emitted before a write is issued for a new record. Use this hook for formatting 
 * `record` instance of [`dbx.Record`](#dbx.Record)
 * `callback` callback function accepting the following parameters:
 	* `err` instance of [`dbx.Error`](#dbx.Error) if error, false otherwise. Errors will abort the write and it will bubble up
-	* `record` instance of [`dbx.Record`](#dbx.Record) (if you wish for any changes to be made) or falsey if nothing is to be changed
 
 ### Event: 'preDelete'
 
@@ -393,7 +470,7 @@ Create a new record, does not issue a create in the DB yet.
 	* `err` instance of [`dbx.Error`](#dbx.Error) if error, false otherwise
 	* `record` instance of [`dbx.Record`](#dbx.Record)
 
-### model.get(id, [fromCache = true, ]callback)
+### model.get(id, [fromCache], callback)
 
 Fetch one by the primary key.
 
@@ -403,7 +480,7 @@ Fetch one by the primary key.
 	* `err` instance of [`dbx.Error`](#dbx.Error) if error, false otherwise
 	* `record` instance of [`dbx.Record`](#dbx.Record)
 
-### model.getAll(ids, [fromCache = true, ]callback)
+### model.getAll(ids, [fromCache], callback)
 
 Fetch many by an array of primary keys.
 
@@ -413,7 +490,7 @@ Fetch many by an array of primary keys.
 	* `err` instance of [`dbx.Error`](#dbx.Error) if error, false otherwise
 	* `records`	Array, instances of [`dbx.Record`](#dbx.Record)
 
-### model.search(query, [fromCache = true, ]callback)
+### model.search(query, [fromCache], callback)
 
 Perform a search on a model.
 
@@ -423,7 +500,7 @@ Perform a search on a model.
 	* `err` instance of [`dbx.Error`](#dbx.Error) if error, false otherwise
 	* `records`	Array, instances of [`dbx.Record`](#dbx.Record)
 
-### model.query(sql, [fromCache = true, ]callback)
+### model.query(sql, [fromCache], callback)
 
 Alias of `connection.query()`
 
